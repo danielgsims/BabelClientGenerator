@@ -1,0 +1,28 @@
+{
+  "name": "notes",
+  "version": "0.0.1",
+  "description": "A web api to create HTTP clients.",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.10.0",
+    "express": "~4.10.2",
+    "raml-parser": "^0.8.10"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/supermitsuba/BabelClientGenerator"
+  },
+  "keywords": [
+    "BabelClientGenerator"
+  ],
+  "author": "Jorden Lowe",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/supermitsuba/BabelClientGenerator/issues"
+  },
+  "homepage": "https://github.com/supermitsuba/BabelClientGenerator"
+}
