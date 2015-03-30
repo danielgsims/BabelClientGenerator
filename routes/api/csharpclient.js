@@ -1,10 +1,15 @@
 var path = require('path');  
+var ejs = require('ejs');
 var fs = require('fs');
 var raml = require('raml-parser');
 
-module.exports = function (app) {
+var csTemplate = null;
+module.exports = function (app, baseLocation) {
 
   app.post('/api/clients', ConvertJsonToCsharp);
+  var csharpPath = path.join(baseLocation, 'views/csharp.ejs');
+  var csharpFile = fs.readFileSync(csharpPath, 'utf8');
+  csTemplate = ejs.compile(csharpFile);
 };
 
 function ConvertJsonToCsharp(request, response){
@@ -27,7 +32,7 @@ function ConvertJsontoClient(request, response){
 		response.status(400).send("{'Message':'Could not parse the request.'}")
 		response.end();
 	}
-	
+
 	var description = obj.description;
 	var languageType = obj.languageType;
 
@@ -48,6 +53,6 @@ function ValidTypes(){
 }
 
 function CreateCSharpClient(description, response){
-	response.send("OK");
+	response.status(200).send(csTemplate(description));
 	response.end();
 }

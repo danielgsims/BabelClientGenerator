@@ -14,7 +14,7 @@ function main() {
   app.set('view options', { layout: false });   
 
   var server = http.createServer(app);
-  require('./routes')(app);
+  require('./routes')(app, __dirname);
   server.listen(process.env.PORT);
 }
 

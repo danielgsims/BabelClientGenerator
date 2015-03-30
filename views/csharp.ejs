@@ -1,0 +1,46 @@
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+
+<% if (typeof documentation !== "undefined") { %>
+/*
+Documentation:
+	Title: <%- (documentation.title || "") %>
+	Content: <%- (documentation.content || "") %>
+
+*/
+<% } %>
+
+namespace rest.raml
+{
+	///<summary>
+	/// <%= title %> Client API
+	/// Version: <%= (typeof version === "undefined" ? "" : version) %>
+	/// </summary>
+	public class Client : IDisposible
+	{
+		readonly HttpClient _client;
+
+		public Client(string acceptHeader, string baseUri)
+		{
+			_client = new HttpClient();
+			_client.BaseAddress = new System.Uri(baseUri);
+			_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptHeader));
+		}
+
+		<% if(typeof resources !== "undefined") { 
+				for(var i = 0; i < resources.length; i++) {
+		%>
+			///<summary>
+			///
+			///Documentation: <%- JSON.stringify(resources[i]) %>
+			///</summary>
+
+		<% }} %>
+
+		public void Dispose(){
+			_client.Dispose();
+		}
+	}
+}
