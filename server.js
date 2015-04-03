@@ -2,6 +2,7 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var config = require('./config');
 var express = require('express');
+var partials = require('express-partials');
 var app = express();
 module.exports = app;
 
@@ -10,7 +11,6 @@ function main() {
 
   app.use(bodyParser.text());
   app.use(bodyParser.json());
-  app.set('view engine', 'ejs');
   app.set('view options', { layout: false });   
 
   var server = http.createServer(app);

@@ -14,7 +14,7 @@ Documentation:
 
 namespace rest.raml
 {
-	///<summary>
+	/// <summary>
 	/// <%= title %> Client API
 	/// Version: <%= (typeof version === "undefined" ? "" : version) %>
 	/// </summary>
@@ -31,14 +31,10 @@ namespace rest.raml
 
 		<% if(typeof resources !== "undefined") { 
 				for(var i = 0; i < resources.length; i++) {
-		%>
-			///<summary>
-			///
-			///Documentation: <%- JSON.stringify(resources[i]) %>
-			///</summary>
-
+					var r = resources[i];
+					r.partialPath = partialPath;
+		%><%- include(partialPath, r) %>
 		<% }} %>
-
 		public void Dispose(){
 			_client.Dispose();
 		}

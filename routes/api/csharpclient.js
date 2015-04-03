@@ -2,18 +2,23 @@ var path = require('path');
 var ejs = require('ejs');
 var fs = require('fs');
 var raml = require('raml-parser');
-
 var csTemplate = null;
-module.exports = function (app, baseLocation) {
+var location = "";
 
-  app.post('/api/clients', ConvertJsonToCsharp);
-  var csharpPath = path.join(baseLocation, 'views/csharp.ejs');
-  var csharpFile = fs.readFileSync(csharpPath, 'utf8');
-  csTemplate = ejs.compile(csharpFile);
+module.exports = function (app, baseLocation) {
+	location = baseLocation;
+  	app.post('/api/clients', ConvertJsonToCsharp);
+
+  	var csharpPath = path.join(baseLocation, 'views/csharp.ejs');
+  	var csharpFile = fs.readFileSync(csharpPath, 'utf8');
+	var partial = path.join(location, 'views/csharpFunction.ejs');
+  	
+  	csTemplate = ejs.compile(csharpFile, { 'filename':partial });
 };
 
 function ConvertJsonToCsharp(request, response){
-	if(request.accepts('application/json'))
+	response.set('Content-Type', 'text/plain');
+	if(request.accepts('text/plain'))
 	{
 		ConvertJsontoClient(request, response);
 	}
@@ -35,14 +40,15 @@ function ConvertJsontoClient(request, response){
 
 	var description = obj.description;
 	var languageType = obj.languageType;
+	var partial = path.join(location, 'views/csharpFunction.ejs');
 
 	switch(languageType)
 	{
 		case 'C#':
-			CreateCSharpClient(description, response);
+			CreateCSharpClient(description, partial, response);
 			break;
 		default:
-			response.status(400).send("{'Message':'The server can only create clients of these types: "+ValidTypes()+". You selected: "+languageType+"'}")
+			response.status(400).send("{\"Message\":\"The server can only create clients of these types: "+ValidTypes()+". You selected: "+languageType+"\"}")
 			response.end();
 			break;
 	}
@@ -52,7 +58,11 @@ function ValidTypes(){
 	return "C#";
 }
 
-function CreateCSharpClient(description, response){
-	response.status(200).send(csTemplate(description));
+function CreateCSharpClient(description, partial, response){
+	description.partialPath = partial;
+	var result = csTemplate(description);
+	result = result.split('\n<').join('<');
+	result = result.split('\r\n<').join('<');
+	response.status(200).send(result);
 	response.end();
 }
