@@ -15,7 +15,7 @@ command.ProcessRequest = function (description) {
 	var functions = '';
 	if(typeof description.resources !== "undefined") { 
 		for(var i = 0; i < description.resources.length; i++) {
-			functions += GenerateFunctionClient(description.resources[i])
+			functions += GenerateFunctionClient(description.resources[i], description.resources[i]);
 		}
 	}
 
@@ -24,17 +24,17 @@ command.ProcessRequest = function (description) {
   	return namespaces + documentation + namespace + classcomments + classdeclaration + functions + closingStatements;
 };
 
-function GenerateFunctionClient(resource){
+function GenerateFunctionClient(resource, parentResource){
 	var results = "";
 
 	if(typeof resource.methods !== "undefined") { 
         for(var i = 0; i < resource.methods.length; i++) {
 
-            results += GenerateFunction(resource.methods[i]);
+            results += GenerateFunction(resource.methods[i], parentResource);
 
             if(typeof resource.methods[i].resources !== "undefined") { 
 	            for(var h = 0; h < resource.methods[i].resources.length; h++) {
-	                results += GenerateFunctionClient(resource.methods[i].resources[h]);
+	                results += GenerateFunctionClient(resource.methods[i].resources[h], resource);
 	            }
 	        }
         }
@@ -43,7 +43,7 @@ function GenerateFunctionClient(resource){
 	return results;
 }
 
-function GenerateFunction(method){
+function GenerateFunction(method, parentResource){
 	var functionComment = '\t\t/// <summary>\n\t\t/// '+method.displayName+'\n\t\t/// Documentation: '+method.description+'\n\t\t/// </summary>\n';
     var uriParameters = "";
     if(typeof method.allUriParameters !== "undefined") { 
@@ -68,13 +68,46 @@ function GenerateFunction(method){
 	}
 	functionComment += '\t\t/// <returns></returns>\n';
 	
-	return functionComment + GenerateFunctionBody(method, uriParameters, queryParameters, putPostParam);	
+	return functionComment + GenerateFunctionBody(method, parentResource, uriParameters, queryParameters, putPostParam);	
 }
 
-function GenerateFunctionBody(method, uriParameters, queryParameters, putPostParam){
+function GenerateFunctionBody(method, parentResource, uriParameters, queryParameters, putPostParam){
 	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+method.method+'_'+method.uniqueId+'('+uriParameters + queryParameters + putPostParam +')\n';
 	functionName += '\t\t{\n';
+	functionName += '\t\t\tvar relativeUri = "' + (parentResource.parentUrl || '') + parentResource.relativeUri + '";\n';
 	
+	if(parentResource.allUriParameters){
+		for(var i = 0; i < parentResource.allUriParameters.length; i++){
+			functionName += '\t\t\trelativeUri = relativeUri.Replace("{"+"'+parentResource.allUriParameters[i].displayName+'"+"}", '+parentResource.allUriParameters[i].displayName+'.ToString());\n';
+		}
+	}
+
+	if(method.queryParameters){
+		functionName += 'relativeUri += relativeUri +"?";';
+		for(var i = 0; i < method.queryParameters.length; i++){
+			functionName += '\t\t\trelativeUri += relativeUri + "&'+method.queryParameters[i].displayName+'=" + '+method.queryParameters[i].displayName+'.ToString();\n';
+		}
+	}
+
+    if(method.method == 'put' || method.method == 'post'){
+    	functionName += '\t\t\tvar stringContent = new StringContent(body, Encoding.UTF8, contentType);\n';
+    }
+    
+    switch(method.method){
+    	case 'get':
+    		functionName += '\t\t\treturn await _client.GetAsync(relativeUri);\n';
+    		break;
+    	case 'put':
+    		functionName += '\t\t\treturn await _client.PutAsync(relativeUri, stringContent);\n';
+    		break;
+    	case 'post':
+    		functionName += '\t\t\treturn await _client.PostAsync(relativeUri, stringContent);\n';
+    		break;
+    	case 'delete':
+    		functionName += '\t\t\treturn await _client.DeleteAsync(relativeUri);\n';
+    		break;
+    }
+
 	functionName += '\t\t}\n\n';
 	return functionName;
 }

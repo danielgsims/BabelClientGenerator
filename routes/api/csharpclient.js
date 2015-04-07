@@ -15,7 +15,7 @@ function ConvertJsonToCsharp(request, response){
 		ConvertJsontoClient(request, response);
 	}
 	else{
-		response.status(415).send("{'Message':'The server only exceptions application/json'}")
+		response.status(415).send("{'Message':'The server only exceptions application/json'}");
 		response.end();
 	}
 }
@@ -26,7 +26,7 @@ function ConvertJsontoClient(request, response){
 		var obj = JSON.parse(request.body);
 	}
 	catch(err){
-		response.status(400).send("{'Message':'Could not parse the request.'}")
+		response.status(400).send("{'Message':'Could not parse the request.'}");
 		response.end();
 	}
 
@@ -39,7 +39,7 @@ function ConvertJsontoClient(request, response){
 			CreateCSharpClient(description, location, response);
 			break;
 		default:
-			response.status(400).send("{\"Message\":\"The server can only create clients of these types: "+ValidTypes()+". You selected: "+languageType+"\"}")
+			response.status(400).send("{\"Message\":\"The server can only create clients of these types: "+ValidTypes()+". You selected: "+languageType+"\"}");
 			response.end();
 			break;
 	}
