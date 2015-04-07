@@ -1,7 +1,7 @@
 var command = exports;
 
 command.ProcessRequest = function (description) {
-	var namespaces = "using System.Net.Http;\nusing System.Net.Http.Headers;\nusing System.Text;\nusing System.Threading.Tasks;\n\n";
+	var namespaces = "using System;\nusing System.Net.Http;\nusing System.Net.Http.Headers;\nusing System.Text;\nusing System.Threading.Tasks;\n\n";
 	
 	var documentation = "";
 	if (typeof description.documentation !== "undefined") {
@@ -46,23 +46,24 @@ function GenerateFunctionClient(resource, parentResource){
 function GenerateFunction(method, parentResource){
 	var functionComment = '\t\t/// <summary>\n\t\t/// '+parentResource.displayName+'\n\t\t/// Documentation: '+method.description+'\n\t\t/// </summary>\n';
     var uriParameters = "";
-    if(typeof method.allUriParameters !== "undefined") { 
-        for(var j = 0; j < method.allUriParameters.length; j++) { 
-            uriParameters += method.allUriParameters[j].type + ' '+ method.allUriParameters[j].displayName +',';
-            functionComment += '\t\t/// <param name="'+method.allUriParameters[j].displayName+'">'+method.allUriParameters[j].description+'</param>\n';
+    if(typeof parentResource.uriParameters !== "undefined") { 
+        for(var j in parentResource.uriParameters) { 
+            uriParameters += parentResource.uriParameters[j].type + ' '+ parentResource.uriParameters[j].displayName +',';
+            functionComment += '\t\t/// <param name="'+parentResource.uriParameters[j].displayName+'">'+parentResource.uriParameters[j].description+'</param>\n';
         }
     }
 
 	var queryParameters = "";
-	if(typeof method.queryParameters !== "undefined") { 
-	    for(var j = 0; j < method.queryParameters.length; j++) { 
-	        queryParameters += method.queryParameters[j].type + ' '+ method.queryParameters[j].displayName +',';
-	        functionComment += '\t\t/// <param name="'+method.queryParameters[j].displayName+'">'+method.queryParameters[j].description+'</param>\n';
+	if(typeof parentResource.queryParameters !== "undefined") { 
+	    for(var j in parentResource.queryParameters) { 
+	        queryParameters += parentResource.queryParameters[j].type + ' '+ parentResource.queryParameters[j].displayName +',';
+	        functionComment += '\t\t/// <param name="'+parentResource.queryParameters[j].displayName+'">'+parentResource.queryParameters[j].description+'</param>\n';
 	    }
 	}
 
-	var putPostParam = 'string body, string contentType';
+	var putPostParam = '';
 	if(method.method == 'put' || method.method == 'post') { 
+		putPostParam = 'string body, string contentType';
 		functionComment += '\t\t/// <param name="body">This is the body of the message.</param>\n'; 
 		functionComment += '\t\t/// <param name="contentType">This is the type of data you are sending in the body.</param>\n';
 	}
@@ -76,16 +77,16 @@ function GenerateFunctionBody(method, parentResource, uriParameters, queryParame
 	functionName += '\t\t{\n';
 	functionName += '\t\t\tvar relativeUri = "' + (parentResource.parentUrl || '') + parentResource.relativeUri + '";\n';
 	
-	if(parentResource.allUriParameters){
-		for(var i = 0; i < parentResource.allUriParameters.length; i++){
-			functionName += '\t\t\trelativeUri = relativeUri.Replace("{"+"'+parentResource.allUriParameters[i].displayName+'"+"}", '+parentResource.allUriParameters[i].displayName+'.ToString());\n';
+	if(parentResource.uriParameters){
+		for(var x in parentResource.uriParameters){
+			functionName += '\t\t\trelativeUri = relativeUri.Replace("{"+"'+parentResource.uriParameters[x].displayName+'"+"}", '+parentResource.uriParameters[x].displayName+'.ToString());\n';
 		}
 	}
 
-	if(method.queryParameters){
+	if(parentResource.queryParameters){
 		functionName += 'relativeUri += relativeUri +"?";';
-		for(var i = 0; i < method.queryParameters.length; i++){
-			functionName += '\t\t\trelativeUri += relativeUri + "&'+method.queryParameters[i].displayName+'=" + '+method.queryParameters[i].displayName+'.ToString();\n';
+		for(var i in parentResource.queryParameters){
+			functionName += '\t\t\trelativeUri += relativeUri + "&'+parentResource.queryParameters[i].displayName+'=" + '+parentResource.queryParameters[i].displayName+'.ToString();\n';
 		}
 	}
 
