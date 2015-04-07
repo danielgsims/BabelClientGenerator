@@ -1,19 +1,11 @@
-var path = require('path');  
-var ejs = require('ejs');
+var path = require('path');
 var fs = require('fs');
 var raml = require('raml-parser');
-var csTemplate = null;
 var location = "";
 
 module.exports = function (app, baseLocation) {
 	location = baseLocation;
   	app.post('/api/clients', ConvertJsonToCsharp);
-
-  	var csharpPath = path.join(baseLocation, 'views/csharp.ejs');
-  	var csharpFile = fs.readFileSync(csharpPath, 'utf8');
-	var partial = path.join(location, 'views/csharpFunction.ejs');
-  	
-  	csTemplate = ejs.compile(csharpFile, { 'filename':partial });
 };
 
 function ConvertJsonToCsharp(request, response){
@@ -40,12 +32,11 @@ function ConvertJsontoClient(request, response){
 
 	var description = obj.description;
 	var languageType = obj.languageType;
-	var partial = path.join(location, 'views/csharpFunction.ejs');
 
 	switch(languageType)
 	{
 		case 'C#':
-			CreateCSharpClient(description, partial, response);
+			CreateCSharpClient(description, location, response);
 			break;
 		default:
 			response.status(400).send("{\"Message\":\"The server can only create clients of these types: "+ValidTypes()+". You selected: "+languageType+"\"}")
@@ -59,10 +50,9 @@ function ValidTypes(){
 }
 
 function CreateCSharpClient(description, partial, response){
-	description.partialPath = partial;
-	var result = csTemplate(description);
-	result = result.split('\n<').join('<');
-	result = result.split('\r\n<').join('<');
+
+  	var csharpCommand = require(path.join(location, 'libs/csharpcommand.js'));
+	var result = csharpCommand.ProcessRequest(description);
 	response.status(200).send(result);
 	response.end();
 }
