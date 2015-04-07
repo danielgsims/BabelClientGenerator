@@ -44,7 +44,7 @@ function GenerateFunctionClient(resource, parentResource){
 }
 
 function GenerateFunction(method, parentResource){
-	var functionComment = '\t\t/// <summary>\n\t\t/// '+method.displayName+'\n\t\t/// Documentation: '+method.description+'\n\t\t/// </summary>\n';
+	var functionComment = '\t\t/// <summary>\n\t\t/// '+parentResource.displayName+'\n\t\t/// Documentation: '+method.description+'\n\t\t/// </summary>\n';
     var uriParameters = "";
     if(typeof method.allUriParameters !== "undefined") { 
         for(var j = 0; j < method.allUriParameters.length; j++) { 
@@ -72,7 +72,7 @@ function GenerateFunction(method, parentResource){
 }
 
 function GenerateFunctionBody(method, parentResource, uriParameters, queryParameters, putPostParam){
-	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+method.method+'_'+method.uniqueId+'('+uriParameters + queryParameters + putPostParam +')\n';
+	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+parentResource.displayName+'('+uriParameters + queryParameters + putPostParam +')\n';
 	functionName += '\t\t{\n';
 	functionName += '\t\t\tvar relativeUri = "' + (parentResource.parentUrl || '') + parentResource.relativeUri + '";\n';
 	
