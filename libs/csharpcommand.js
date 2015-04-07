@@ -10,7 +10,7 @@ command.ProcessRequest = function (description) {
 
 	var namespace = 'namespace rest.raml\n{\n';
 	var classcomments = '\t/// <summary>\n\t/// '+description.title+' Client API\n\t/// Version:'+ (typeof description.version === "undefined" ? "" : description.version) +'\n\t/// </summary>\n'
-	var classdeclaration = '\tpublic class Client : IDisposible\n\t{\n\t\treadonly HttpClient _client;\n\t\tpublic Client(string acceptHeader, string baseUri)\n\t\t{\n\t\t\t_client = new HttpClient();\n\t\t\t_client.BaseAddress = new System.Uri(baseUri);\n\t\t\t_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptHeader));\n\t\t}\n\n';
+	var classdeclaration = '\tpublic class Client : IDisposable\n\t{\n\t\treadonly HttpClient _client;\n\t\tpublic Client(string acceptHeader, string baseUri)\n\t\t{\n\t\t\t_client = new HttpClient();\n\t\t\t_client.BaseAddress = new System.Uri(baseUri);\n\t\t\t_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptHeader));\n\t\t}\n\n';
 
 	var functions = '';
 	if(typeof description.resources !== "undefined") { 
@@ -19,7 +19,7 @@ command.ProcessRequest = function (description) {
 		}
 	}
 
-	var closingStatements = '\t\tpublic void Dispose()\n\t\t{\n\t\t\t_client.Dispose();\n\t\t}\n\t}\n}'
+	var closingStatements = '\t\tbool disposed = false;\n\n\t\tprotected virtual void Dispose(bool disposing)\n\t\t{\n\t\t\tif(disposed) return;\n\n\t\t\tif (disposing)\n\t\t\t{\n\t\t\t\t_client.Dispose();\n\t\t\t}\n\n\t\t\tdisposed = true;\n\t\t}\n\n\t\tpublic void Dispose()\n\t\t{\n\t\t\tDispose(true);\n\t\t\tGC.SuppressFinalize(this);\n\t\t}\n\t}\n}'
 
   	return namespaces + documentation + namespace + classcomments + classdeclaration + functions + closingStatements;
 };
@@ -48,7 +48,7 @@ function GenerateFunction(method, parentResource){
     var uriParameters = "";
     if(typeof parentResource.uriParameters !== "undefined") { 
         for(var j in parentResource.uriParameters) { 
-            uriParameters += parentResource.uriParameters[j].type + ' '+ parentResource.uriParameters[j].displayName +',';
+            uriParameters += ConvertTypeToCSharpType(parentResource.uriParameters[j].type) + ' '+ parentResource.uriParameters[j].displayName +',';
             functionComment += '\t\t/// <param name="'+parentResource.uriParameters[j].displayName+'">'+parentResource.uriParameters[j].description+'</param>\n';
         }
     }
@@ -56,7 +56,7 @@ function GenerateFunction(method, parentResource){
 	var queryParameters = "";
 	if(typeof parentResource.queryParameters !== "undefined") { 
 	    for(var j in parentResource.queryParameters) { 
-	        queryParameters += parentResource.queryParameters[j].type + ' '+ parentResource.queryParameters[j].displayName +',';
+	        queryParameters += ConvertTypeToCSharpType(parentResource.queryParameters[j].type) + ' '+ parentResource.queryParameters[j].displayName +',';
 	        functionComment += '\t\t/// <param name="'+parentResource.queryParameters[j].displayName+'">'+parentResource.queryParameters[j].description+'</param>\n';
 	    }
 	}
@@ -73,13 +73,15 @@ function GenerateFunction(method, parentResource){
 }
 
 function GenerateFunctionBody(method, parentResource, uriParameters, queryParameters, putPostParam){
-	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+parentResource.displayName+'('+uriParameters + queryParameters + putPostParam +')\n';
+	var parameters = uriParameters + queryParameters + putPostParam;
+	parameters = parameters[parameters.length-1] == ',' ? parameters.substring(0, parameters.length-1) : parameters;
+	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+parentResource.displayName+'('+ parameters +')\n';
 	functionName += '\t\t{\n';
 	functionName += '\t\t\tvar relativeUri = "' + (parentResource.parentUrl || '') + parentResource.relativeUri + '";\n';
 	
 	if(parentResource.uriParameters){
 		for(var x in parentResource.uriParameters){
-			functionName += '\t\t\trelativeUri = relativeUri.Replace("{"+"'+parentResource.uriParameters[x].displayName+'"+"}", '+parentResource.uriParameters[x].displayName+'.ToString());\n';
+			functionName += '\t\t\trelativeUri = relativeUri.Replace("{'+parentResource.uriParameters[x].displayName+'}", '+parentResource.uriParameters[x].displayName+'.ToString());\n';
 		}
 	}
 
@@ -111,4 +113,24 @@ function GenerateFunctionBody(method, parentResource, uriParameters, queryParame
 
 	functionName += '\t\t}\n\n';
 	return functionName;
+}
+
+function ConvertTypeToCSharpType(type){
+	switch(type){
+		case 'integer':
+			return 'long';
+			break;
+		case 'number':
+			return 'decimal';
+			break;
+		case 'date':
+			return 'DateTime'
+			break;
+		case 'boolean':
+			return 'bool';
+			break;
+		default:
+			return type;
+			break;
+	}
 }
