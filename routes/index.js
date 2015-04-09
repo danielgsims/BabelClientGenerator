@@ -10,4 +10,12 @@ module.exports = function (app, baseLocation) {
     // Load the route file.
     require('./api/' + file)(app, baseLocation);
   });
+
+  fs.readdirSync('./routes/site').forEach(function (file) {
+    // Avoid to read this current file.
+    if (file === path.basename(__filename)) { return; }
+
+    // Load the route file.
+    require('./site/' + file)(app, baseLocation);
+  });
 };
