@@ -22,6 +22,10 @@ routerApp
         var jsonOfRaml = generatorProvider.PostRamlForJson(raml);
 
         $scope.message = generatorProvider.PostJsonForClientCode(jsonOfRaml);
+
+        $scope.generate = function(){
+        	$scope.hasRamlResult = !$scope.hasRamlResult;
+        }
     });
 
 routerApp.factory('generatorProvider', function($http, $log, $q) {

@@ -1,3 +1,14 @@
-<div>
-{{message}}
+<div class="ramlInput">
+	<div class="form-horizontal">
+		<div class="form-group">
+			<label for="ramlUrl" class="col-sm-2 control-label">Url for RAML</label>
+			<div class="col-sm-8">
+				<input type="text" class="form-control" id="ramlUrlId" placeholder="http://derp.com/raml" />
+			</div>
+		</div>
+		<input type="button" ng:click="generate()" class="btn btn-primary" value="Create Client" />
+	</div>
+</div>
+<div class="ramlOutput ng-hide" ng-show="hasRamlResult">
+	<textarea class="form-control" rows="20"></textarea>
 </div>
