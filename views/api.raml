@@ -1,0 +1,131 @@
+#%RAML 0.8
+---
+title: Test API
+baseUri: http://www.google.com/
+protocols: [HTTP]
+version: 1
+mediaType: application/json
+documentation: 
+  - title: The Description of the API
+    content: |
+      This is a test
+/api/derp:
+  displayName: GetDerp
+  get:
+    description: deeee
+/api/derp/{id}:
+  displayName: GetDerpById
+  uriParameters: 
+      id: 
+        type: integer
+        required: false
+        description: 
+        example: |
+            
+  get:
+    description: 
+/api/derp?value={value}&name={name}:
+  displayName: CreateNewDerp
+  uriParameters: 
+      value: 
+        type: string
+        required: false
+        description: 
+        example: |
+            
+      name: 
+        type: string
+        required: false
+        description: 
+        example: |
+            
+  post:
+    description: 
+/api/tests:
+  displayName:
+  get:
+    description: This gets the tests
+    headers:
+      Accept: 
+        displayName: Accept
+        example: application/json
+        type: string
+        description: This is the content type we want from the server
+    responses:
+      400:
+        body:
+          application/json: 
+            schema: 
+            example: |
+                [bad request]
+      200:
+        body:
+          application/hal+json: 
+            schema: values
+            example: |
+                ['value1', 'value2']
+      500:
+        body:
+          application/json: 
+            schema: 
+            example: |
+                [internal server error]
+  post:
+    
+    description: This inserts a test
+    body:
+      application/yaml: 
+        formParameters: 
+          testCase: 
+            description  : The test
+            type  : string
+            required  : false
+            example  :
+    headers:
+      Accept: 
+        displayName: Accept
+        example: application/json
+        type: integer
+        minimum: -1
+        maximum: -2
+        description: This is the content type we want from the server
+    responses:
+      400:
+        body:
+          application/json: 
+            schema: 
+            example: |
+                [bad request]
+      200:
+        description: |
+          This is the standard request back.
+        body:
+          application/json: 
+            schema: 
+            example: |
+                [should be the location of this test]
+      500:
+        body:
+          application/json: 
+            schema: 
+            example: |
+                [internal server error]
+/api/tests/{id}: #name: this
+  displayName: 
+  uriParameters: 
+      id: 
+        type: integer
+        required: false
+        description: id of the test
+        example: |
+            
+  put:
+    description: updates the test
+    body:
+      application/x-www-form-urlencoded:: 
+        formParameters: 
+          testCase: 
+            description  : The test
+            type  : string
+            required  : false
+            example  : 

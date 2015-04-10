@@ -11,12 +11,12 @@ module.exports = function (app, location) {
 function ConvertDescriptionToModel(request, response){
 	response.set('Content-Type', 'application/json');
 
-	if(request.accepts('application/yaml+raml'))
+	if(request.accepts('application/json'))
 	{
 		ConvertRAMLtoJson(request, response);
 	}
 	else{
-		response.status(415).send("{\"Message\":\"The server only exceptions application/yaml+raml\"}")
+		response.status(415).send("{\"Message\":\"The server only exceptions application/yaml+raml and returns application/json\"}")
 		response.end();
 	}
 }

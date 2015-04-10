@@ -3,16 +3,19 @@ var clientGeneratorProvider = (function () {
         this.httpService = httpService;
     }
 
-    clientGeneratorProvider.prototype.GetRamlUrl = function(url){
-    	return 'raml';
+    clientGeneratorProvider.prototype.GetRamlUrl = function(url, successFallback, errorFallback){
+        $http({method: 'GET', url: url})
+             .success(successFallback)//http://localhost:8060/api/raml
+             .error(errorFallback);
     }
 
     clientGeneratorProvider.prototype.PostRamlForJson = function(raml){
-    	return {'the':'json'};
+
+    	return raml;
     }
 
     clientGeneratorProvider.prototype.PostJsonForClientCode = function(jsonObj){
-    	return 'the string of client code';
+    	return jsonObj;
     }
 
     return clientGeneratorProvider;

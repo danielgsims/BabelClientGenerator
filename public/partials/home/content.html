@@ -3,12 +3,17 @@
 		<div class="form-group">
 			<label for="ramlUrl" class="col-sm-2 control-label">Url for RAML</label>
 			<div class="col-sm-8">
-				<input type="text" class="form-control" id="ramlUrlId" placeholder="http://derp.com/raml" />
+				<input type="text" class="form-control" ng-model="raml.url" placeholder="http://derp.com/raml" />
 			</div>
 		</div>
-		<input type="button" ng:click="generate()" class="btn btn-primary" value="Create Client" />
+		<div ng-show="startGenerator" >
+			<input type="button" ng:click="generate()" class="btn btn-primary" value="Create Client" />
+		</div>
+		<div class="ng-hide" ng-show="loading">
+			<img src="images/loading.gif">
+		</div>
 	</div>
 </div>
 <div class="ramlOutput ng-hide" ng-show="hasRamlResult">
-	<textarea class="form-control" rows="20"></textarea>
+	<textarea class="form-control" rows="20">{{client}}</textarea>
 </div>
