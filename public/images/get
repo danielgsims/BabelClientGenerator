@@ -1,0 +1,125 @@
+#%RAML 0.8
+---
+title: Rocketdyne API
+baseUri: http://rocketdynetest/
+protocols: [HTTP]
+version: 1
+mediaType: application/json
+documentation: 
+  - title: The Description of the API
+    content: |
+      This is a Middleware Service to enable Quicken Loans to obtain vendor documents as well as  consume data and then populate the QL Application with the same data - Then Rocketdyne will save the PDF file(s) to QL and OnBase
+/api/Tax/GetAllTaxData?accessToken={accessToken}&loanNumber={loanNumber}:
+  uriParameters: 
+      accessToken: 
+        type: string
+        required: false
+        description: Vendor requires a unique security token before they will pass data to Quicken Loans. This parameter includes - obtain the security token from the vendor and send back the security token in order to get back the tax list from the vendor.
+        example: |
+            
+      loanNumber: 
+        type: integer
+        required: false
+        description: The QL Application will provide a loan number to Rocketdyne - the loan number is then used to associate with the document(s) in order to send the PDF file to OnBase
+        example: |
+            
+  get:
+    description: Rocketdyne will call the following three endpoints (GetTaxDocumentList, GetTaxData and SaveTaxDocument). This enables the application to centrailze the three end point calls into one call
+/api/Tax/GetAllTaxDataAndSaveAllTaxDocuments?accessToken={accessToken}&loanNumber={loanNumber}:
+  uriParameters: 
+      accessToken: 
+        type: string
+        required: false
+        description: Vendor requires a unique security token before they will pass data to Quicken Loans. This parameter includes - obtain the security token from the vendor and send back the security token in order to get back the tax list from the vendor.
+        example: |
+            
+      loanNumber: 
+        type: integer
+        required: false
+        description: The QL Application will provide a loan number to Rocketdyne - the loan number is then used to associate with the document(s) in order to send the PDF file to OnBase
+        example: |
+            
+  get:
+    description: Rocketdyne will call the following three endpoints (GetTaxDocumentList, GetTaxData and SaveTaxDocument). This enables the application to centrailze the three end point calls into one call
+/api/Tax/GetTaxData?accessToken={accessToken}&docId={docId}:
+  uriParameters: 
+      accessToken: 
+        type: string
+        required: false
+        description: Vendor requires a unique security token before they will pass data to Quicken Loans. This parameter includes - obtain the security token from the vendor and send back the security token in order to get back the tax list from the vendor.
+        example: |
+            
+      docId: 
+        type: string
+        required: false
+        description: The QL Application will request a specific data for that document, based on that request we will send the docId that is associated to the GetTaxDocumentList. The vendor returns the data specific to the docId and Rocketdyne will send the data to the QL application.
+        example: |
+            
+  get:
+    description: Rocketdyne will retrieve the data for Tax Documents that can be consumed by a Quicken Loans application.
+/api/Tax/GetTaxDocumentList?accessToken={accessToken}:
+  uriParameters: 
+      accessToken: 
+        type: string
+        required: false
+        description: Vendor requires a unique security token before they will pass data to Quicken Loans. This parameter includes - obtain the security token from the vendor and send back the security token in order to get back the tax list from the vendor.
+        example: |
+            
+  get:
+    description: Rocketdyne will get a list of tax documents from the vendor then pass the list to the QL application.
+/api/Tax/SaveAllTaxDocuments?accessToken={accessToken}&loanNumber={loanNumber}:
+  uriParameters: 
+      accessToken: 
+        type: string
+        required: false
+        description: Vendor requires a unique security token before they will pass data to Quicken Loans. This parameter includes - obtain the security token from the vendor and send back the security token in order to get back the tax list from the vendor.
+        example: |
+            
+      loanNumber: 
+        type: integer
+        required: false
+        description: The QL Application will provide a loan number to Rocketdyne - the loan number is then used to associate with the document(s) in order to send the PDF file to OnBase
+        example: |
+            
+  post:
+    description: Rocketdyne will Save the All Tax Document(s) to OnBase to View and wait for a response about successful completion.
+             These are the specific steps that outline the details of this method. 1-Get the tax documents from the vendor. 2-Convert the tax document to a PDF. 3-Rocketdyne will send a Sonic Message to Onbase. 4-For each individual document Rocketdyne will send a corresponding sonic message. 5-Save the PDF to Onbase. 5.A-The File naming convention must follow the standard below because of character limitations within OnBase Eg- 9999999999_ 105_ 2013_ 20150126164909.pdf (loanumber_ applicationId _Year _DateTimeStamp) 6-Send message to Conversion.
+/api/Tax/SaveAllTaxDocumentsAsync?accessToken={accessToken}&loanNumber={loanNumber}:
+  uriParameters: 
+      accessToken: 
+        type: string
+        required: false
+        description: Vendor requires a unique security token before they will pass data to Quicken Loans. This parameter includes - obtain the security token from the vendor and send back the security token in order to get back the tax list from the vendor.
+        example: |
+            
+      loanNumber: 
+        type: integer
+        required: false
+        description: The QL Application will provide a loan number to Rocketdyne - the loan number is then used to associate with the document(s) in order to send the PDF file to OnBase
+        example: |
+            
+  post:
+    description: Rocketdyne will Save the All Tax Document(s) to OnBase to View . It's no longer required for the end user to wait on the application screen for the documents to be saved into OnBase. You will get a 202 (accepted) response code acknowledging receipt of the users request, Rocketdyne will save the document to Onbase,  behind the scenes.
+/api/Tax/SaveTaxDocument?accessToken={accessToken}&docId={docId}&loanNumber={loanNumber}:
+  uriParameters: 
+      accessToken: 
+        type: string
+        required: false
+        description: Vendor requires a unique security token before they will pass data to Quicken Loans. This parameter includes - obtain the security token from the vendor and send back the security token in order to get back the tax list from the vendor.
+        example: |
+            
+      docId: 
+        type: string
+        required: false
+        description: The QL Application will request a specific document to be saved to OnBase
+        example: |
+            
+      loanNumber: 
+        type: integer
+        required: false
+        description: The QL Application will provide a loan number to Rocketdyne - the loan number is then used to associate with the document(s) in order to send the PDF file to OnBase
+        example: |
+            
+  post:
+    description: Rocketdyne will Save the Tax Document(s) to OnBase to View and wait for a response about successful completion.
+             These are the specific steps that outline the details of this method. 1-Get the tax documents from the vendor. 2-Convert the tax document to a PDF. 3-Rocketdyne will send a Sonic Message to Onbase. 4-For each individual document Rocketdyne will send a corresponding sonic message. 5-Save the PDF to Onbase. 5.A-The File naming convention must follow the standard below because of character limitations within OnBase Eg- 9999999999_ 105_ 2013_ 20150126164909.pdf (loanumber_ applicationId _Year _DateTimeStamp) 6-Send message to Conversion.

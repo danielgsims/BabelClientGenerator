@@ -26,51 +26,42 @@ routerApp
 
             try {
                 var raml = $scope.raml;
-                $http.get(raml.url) // GETS THE RAML FILE
-                    .success(function (data) {
+
+                $http({
+                     'url': '/api/descriptions',
+                     'method': 'post',
+                     'headers': {
+                       'Accept': 'application/json',
+                       'Content-Type': undefined
+                     },
+                     'data': raml.url
+                }).success(function(data){  //GETS JSON FOR A RAML FILE
                         $http({
-                             'url': '/api/descriptions',
+                             'url': '/api/clients',
                              'method': 'post',
                              'headers': {
-                               'Accept': 'application/json',
-                               'Content-Type': undefined
+                                'Accept': 'text/plain',
+                                'Content-Type': undefined
                              },
-                             'data': data
-                        }).success(function(data){  //GETS JSON FOR A RAML FILE
-                                $http({
-                                     'url': '/api/clients',
-                                     'method': 'post',
-                                     'headers': {
-                                        'Accept': 'text/plain',
-                                        'Content-Type': undefined
-                                     },
-                                     'data': JSON.stringify({ 'description':data,'languageType':'C#' })
-                                }).success(function(data){
-                                    $scope.client = data;
-                                    $scope.hasRamlResult = true;
-                                    $scope.loading = false;
-                                    $scope.startGenerator = true;
-                                }).error(function (data) {
-                                    $scope.client = "Error.";
-                                    $scope.hasRamlResult = true;
-                                    $scope.loading = false;
-                                    $scope.startGenerator = true;
-                                });
-                         })
-                         .error(function (data) {
-                                $scope.client = "Error.";
-                                $scope.hasRamlResult = true;
-                                $scope.loading = false;
-                                $scope.startGenerator = true;
+                             'data': JSON.stringify({ 'description':data,'languageType':'C#' })
+                        }).success(function(data){
+                            $scope.client = data;
+                            $scope.hasRamlResult = true;
+                            $scope.loading = false;
+                            $scope.startGenerator = true;
+                        }).error(function (data) {
+                            $scope.client = "Error.";
+                            $scope.hasRamlResult = true;
+                            $scope.loading = false;
+                            $scope.startGenerator = true;
                         });
-                    })
-                    .error(function (data) {//, status, headers, config) {
+                 })
+                 .error(function (data) {
                         $scope.client = "Error.";
                         $scope.hasRamlResult = true;
                         $scope.loading = false;
                         $scope.startGenerator = true;
-                    });
-
+                });
             }
             catch(err) {
                 $scope.hasRamlResult = true;

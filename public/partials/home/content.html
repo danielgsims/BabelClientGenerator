@@ -2,16 +2,9 @@
 	<div class="form-horizontal">
 
 		<div class="form-group">
-			<label for="ramlUrl" class="col-sm-2 control-label">RAML Document</label>
+			<label for="ramlUrl" class="col-sm-2 control-label">Url or RAML</label>
 			<div class="col-sm-8">
-				<textarea class="form-control" ng-model="raml.text" rows="20"></textarea>
-			</div>
-		</div>
-
-		<div class="form-group">
-			<label for="ramlUrl" class="col-sm-2 control-label">Url for RAML</label>
-			<div class="col-sm-8">
-				<input type="text" class="form-control" ng-model="raml.url" placeholder="http://derp.com/raml" />
+				<textarea class="form-control" rows="3" ng-model="raml.url">{{client}}</textarea>
 			</div>
 		</div>
 

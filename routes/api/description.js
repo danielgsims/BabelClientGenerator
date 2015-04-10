@@ -1,6 +1,7 @@
 var path = require('path');  
 var fs = require('fs');
 var raml = require('raml-parser');
+var validUrl = require('valid-url');
 var baseLocation = "";
 
 module.exports = function (app, location) {
@@ -22,11 +23,31 @@ function ConvertDescriptionToModel(request, response){
 }
 
 function ConvertRAMLtoJson(request, response){
-	raml.load(request.body).then( function(data) {
-		response.status(200).send(JSON.stringify(data))
-		response.end();
-	}, function(error) {
-		response.status(422).send("{ \"Message\":\"Your Raml was ok, but could not be parsed\", \"Error\":"+JSON.stringify(error)+" }");
-		response.end();
-	});
+	var ramlvalue = "";
+
+	if( validUrl.is_uri(request.body) ){
+
+		var r = require('request');
+		r(request.body, function (error, res, body) {
+		  if (!error && response.statusCode == 200) {
+		    raml.load(body).then( function(data) {
+				response.status(200).send(JSON.stringify(data))
+				response.end();
+			}, function(error) {
+				response.status(422).send("{ \"Message\":\"Your Raml was ok, but could not be parsed\", \"Error\":"+JSON.stringify(error)+" }");
+				response.end();
+			});
+		  }
+		});
+	}
+	else{
+		ramlvalue = request.body;
+		raml.load(ramlvalue).then( function(data) {
+			response.status(200).send(JSON.stringify(data))
+			response.end();
+		}, function(error) {
+			response.status(422).send("{ \"Message\":\"Your Raml was ok, but could not be parsed\", \"Error\":"+JSON.stringify(error)+" }");
+			response.end();
+		});
+	}
 }
