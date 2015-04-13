@@ -30,7 +30,7 @@ function GenerateFunctionClient(resource, parentResource){
 	if(typeof resource.methods !== "undefined") { 
         for(var i = 0; i < resource.methods.length; i++) {
 
-            results += GenerateFunction(resource.methods[i], parentResource);
+            results += GenerateFunction(resource.methods[i], resource);
 
             if(typeof resource.methods[i].resources !== "undefined") { 
 	            for(var h = 0; h < resource.methods[i].resources.length; h++) {
@@ -40,24 +40,30 @@ function GenerateFunctionClient(resource, parentResource){
         }
     }
 
+    if(typeof resource.resources !== "undefined") { 
+        for(var h = 0; h < resource.resources.length; h++) {
+            results += GenerateFunctionClient(resource.resources[h], resource);
+        }
+    }
+
 	return results;
 }
 
-function GenerateFunction(method, parentResource){
-	var functionComment = '\t\t/// <summary>\n\t\t/// '+parentResource.displayName+'\n\t\t/// Documentation: '+method.description+'\n\t\t/// </summary>\n';
+function GenerateFunction(method, resource){
+	var functionComment = '\t\t/// <summary>\n\t\t/// '+resource.displayName+'\n\t\t/// Documentation: '+method.description+'\n\t\t/// </summary>\n';
     var uriParameters = "";
-    if(typeof parentResource.uriParameters !== "undefined") { 
-        for(var j in parentResource.uriParameters) { 
-            uriParameters += ConvertTypeToCSharpType(parentResource.uriParameters[j].type) + ' '+ parentResource.uriParameters[j].displayName +',';
-            functionComment += '\t\t/// <param name="'+parentResource.uriParameters[j].displayName+'">'+parentResource.uriParameters[j].description+'</param>\n';
+    if(typeof resource.uriParameters !== "undefined") { 
+        for(var j in resource.uriParameters) { 
+            uriParameters += ConvertTypeToCSharpType(resource.uriParameters[j].type) + ' '+ resource.uriParameters[j].displayName +',';
+            functionComment += '\t\t/// <param name="'+resource.uriParameters[j].displayName+'">'+resource.uriParameters[j].description+'</param>\n';
         }
     }
 
 	var queryParameters = "";
-	if(typeof parentResource.queryParameters !== "undefined") { 
-	    for(var j in parentResource.queryParameters) { 
-	        queryParameters += ConvertTypeToCSharpType(parentResource.queryParameters[j].type) + ' '+ parentResource.queryParameters[j].displayName +',';
-	        functionComment += '\t\t/// <param name="'+parentResource.queryParameters[j].displayName+'">'+parentResource.queryParameters[j].description+'</param>\n';
+	if(typeof resource.queryParameters !== "undefined") { 
+	    for(var j in resource.queryParameters) { 
+	        queryParameters += ConvertTypeToCSharpType(resource.queryParameters[j].type) + ' '+ resource.queryParameters[j].displayName +',';
+	        functionComment += '\t\t/// <param name="'+resource.queryParameters[j].displayName+'">'+resource.queryParameters[j].description+'</param>\n';
 	    }
 	}
 
@@ -69,26 +75,26 @@ function GenerateFunction(method, parentResource){
 	}
 	functionComment += '\t\t/// <returns></returns>\n';
 	
-	return functionComment + GenerateFunctionBody(method, parentResource, uriParameters, queryParameters, putPostParam);	
+	return functionComment + GenerateFunctionBody(method, resource, uriParameters, queryParameters, putPostParam);	
 }
 
-function GenerateFunctionBody(method, parentResource, uriParameters, queryParameters, putPostParam){
+function GenerateFunctionBody(method, resource, uriParameters, queryParameters, putPostParam){
 	var parameters = uriParameters + queryParameters + putPostParam;
 	parameters = parameters[parameters.length-1] == ',' ? parameters.substring(0, parameters.length-1) : parameters;
-	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+parentResource.displayName+'('+ parameters +')\n';
+	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+resource.displayName+'('+ parameters +')\n';
 	functionName += '\t\t{\n';
-	functionName += '\t\t\tvar relativeUri = "' + (parentResource.parentUrl || '') + parentResource.relativeUri + '";\n';
+	functionName += '\t\t\tvar relativeUri = "' + (resource.parentUrl || '') + resource.relativeUri + '";\n';
 	
-	if(parentResource.uriParameters){
-		for(var x in parentResource.uriParameters){
-			functionName += '\t\t\trelativeUri = relativeUri.Replace("{'+parentResource.uriParameters[x].displayName+'}", '+parentResource.uriParameters[x].displayName+'.ToString());\n';
+	if(resource.uriParameters){
+		for(var x in resource.uriParameters){
+			functionName += '\t\t\trelativeUri = relativeUri.Replace("{'+resource.uriParameters[x].displayName+'}", '+resource.uriParameters[x].displayName+'.ToString());\n';
 		}
 	}
 
-	if(parentResource.queryParameters){
+	if(resource.queryParameters){
 		functionName += 'relativeUri += relativeUri +"?";';
-		for(var i in parentResource.queryParameters){
-			functionName += '\t\t\trelativeUri += relativeUri + "&'+parentResource.queryParameters[i].displayName+'=" + '+parentResource.queryParameters[i].displayName+'.ToString();\n';
+		for(var i in resource.queryParameters){
+			functionName += '\t\t\trelativeUri += relativeUri + "&'+resource.queryParameters[i].displayName+'=" + '+resource.queryParameters[i].displayName+'.ToString();\n';
 		}
 	}
 
