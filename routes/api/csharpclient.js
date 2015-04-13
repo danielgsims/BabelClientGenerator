@@ -1,6 +1,5 @@
 var path = require('path');
 var fs = require('fs');
-var raml = require('raml-parser');
 var location = "";
 
 module.exports = function (app, baseLocation) {

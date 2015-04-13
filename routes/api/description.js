@@ -1,6 +1,6 @@
 var path = require('path');  
 var fs = require('fs');
-var raml = require('raml-parser');
+var raml = require('raml2obj');
 var validUrl = require('valid-url');
 var baseLocation = "";
 
@@ -30,7 +30,7 @@ function ConvertRAMLtoJson(request, response){
 		var r = require('request');
 		r(request.body, function (error, res, body) {
 		  if (!error && response.statusCode == 200) {
-		    raml.load(body).then( function(data) {
+		    raml.parse(body).then(function(data) {
 				response.status(200).send(JSON.stringify(data))
 				response.end();
 			}, function(error) {
@@ -42,7 +42,7 @@ function ConvertRAMLtoJson(request, response){
 	}
 	else{
 		ramlvalue = request.body;
-		raml.load(ramlvalue).then( function(data) {
+		raml.parse(ramlvalue).then(function(data) {
 			response.status(200).send(JSON.stringify(data))
 			response.end();
 		}, function(error) {
