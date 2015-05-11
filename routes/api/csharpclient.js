@@ -37,6 +37,9 @@ function ConvertJsontoClient(request, response){
 		case 'C#':
 			CreateCSharpClient(description, location, response);
 			break;
+		case 'PHP':
+			CreatePHPClient(description, location, response);
+			break;
 		default:
 			response.status(400).send("{\"Message\":\"The server can only create clients of these types: "+ValidTypes()+". You selected: "+languageType+"\"}");
 			response.end();
@@ -51,6 +54,14 @@ function ValidTypes(){
 function CreateCSharpClient(description, partial, response){
 
   	var csharpCommand = require(path.join(location, 'libs/csharpcommand.js'));
+	var result = csharpCommand.ProcessRequest(description);
+	response.status(200).send(result);
+	response.end();
+}
+
+function CreatePHPClient(description, partial, response){
+
+  	var csharpCommand = require(path.join(location, 'libs/phpcommand.js'));
 	var result = csharpCommand.ProcessRequest(description);
 	response.status(200).send(result);
 	response.end();

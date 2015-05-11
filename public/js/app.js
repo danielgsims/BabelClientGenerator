@@ -43,7 +43,7 @@ routerApp
                                 'Accept': 'text/plain',
                                 'Content-Type': undefined
                              },
-                             'data': JSON.stringify({ 'description':data,'languageType':'C#' })
+                             'data': JSON.stringify({ 'description':data,'languageType':raml.language })
                         }).success(function(data){
                             $scope.client = data;
                             $scope.hasRamlResult = true;
