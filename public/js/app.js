@@ -19,6 +19,7 @@ routerApp.config(function($stateProvider, $urlRouterProvider) {
 routerApp
     .controller('homeContentController', function($http, $scope, $interval, generatorProvider) {
         $scope.startGenerator = true;
+        $scope.raml = { 'language':'C#' };
 
         $scope.generate = function(){
             $scope.loading = true;

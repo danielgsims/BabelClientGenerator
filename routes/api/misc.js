@@ -6,7 +6,7 @@ var baseLocation = "";
 module.exports = function (app, location) {
 	baseLocation = location;
   	app.get('/api/postman', postman);
-  	app.get('/api/raml', ramlEndpoint);
+  	app.get('/api/raml/test', ramlEndpoint);
 };
 
 function postman(request, response){

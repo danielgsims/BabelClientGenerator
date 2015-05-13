@@ -1,0 +1,58 @@
+{
+  "port": 8081,
+  "protocol": "http",
+  "stubs": [{
+    "responses": [
+      { "is": { "statusCode": 200 , "body" : "{'you':'thanks' }" } }
+    ],
+    "predicates": [{
+      "and": [
+        {
+          "equals": {
+            "path": "/api/derp",
+            "method": "GET",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        }
+      ]
+    }]
+  },
+  {
+    "responses": [
+      { "is": { "statusCode": 200 , "body" : "{'you':'me' }" } }
+    ],
+    "predicates": [{
+      "and": [
+        {
+          "equals": {
+            "path": "/api/tests",
+            "method": "GET",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        }
+      ]
+    }]
+  },
+  {
+    "responses": [
+      { "is": { "statusCode": 200 , "body" : "{'you':'1234' }" } }
+    ],
+    "predicates": [{
+      "and": [
+        {
+          "equals": {
+            "path": "/api/derp/1234",
+            "method": "GET",
+            "headers": {
+              "Accept": "application/json"
+            }
+          }
+        }
+      ]
+    }]
+  }]
+}

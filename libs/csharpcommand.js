@@ -1,16 +1,35 @@
 var command = exports;
 
 command.ProcessRequest = function (description) {
-	var namespaces = "using System;\nusing System.Net.Http;\nusing System.Net.Http.Headers;\nusing System.Text;\nusing System.Threading.Tasks;\n\n";
+	var namespaces = 'using System;\n'
+				   + 'using System.Net.Http;\n'
+				   + 'using System.Net.Http.Headers;\n'
+				   + 'using System.Text;\n'
+				   + 'using System.Threading.Tasks;\n\n';
 	
 	var documentation = "";
 	if (typeof description.documentation !== "undefined") {
-		documentation = '/*\nDocumentation:\n\tTitle: '+ (description.documentation.title || "") + '\n\tContent: '+ (description.documentation.content || "") + '\n\n*/\n';
+		documentation = '/*\n'
+					  + 'Documentation:\n'
+					  + '\tTitle: '+ (description.documentation.title || "") + '\n'
+					  + '\tContent: '+ (description.documentation.content || "") + '\n\n'
+					  + '*/\n';
 	}
 
-	var namespace = 'namespace rest.raml\n{\n';
-	var classcomments = '\t/// <summary>\n\t/// '+description.title+' Client API\n\t/// Version:'+ (typeof description.version === "undefined" ? "" : description.version) +'\n\t/// </summary>\n'
-	var classdeclaration = '\tpublic class Client : IDisposable\n\t{\n\t\treadonly HttpClient _client;\n\t\tpublic Client(string acceptHeader, string baseUri)\n\t\t{\n\t\t\t_client = new HttpClient();\n\t\t\t_client.BaseAddress = new System.Uri(baseUri);\n\t\t\t_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptHeader));\n\t\t}\n\n';
+	var namespace = 'namespace rest.raml\n'
+				  + '{\n';
+
+	var classcomments = '\t/// <summary>\n'
+					  + '\t/// '+description.title+' Client API\n'
+					  + '\t/// Version:'+ (typeof description.version === "undefined" ? "" : description.version) +'\n'
+					  + '\t/// </summary>\n';
+
+	var classdeclaration = '\tpublic class Client : IDisposable\n'
+	                     + '\t{\n'
+	                     + '\t\treadonly HttpClient _client;\n'
+	                     + '\t\tpublic Client(string acceptHeader, string baseUri)\n'
+	                     + '\t\t{\n'
+	                     + '\t\t\t_client = new HttpClient();\n\t\t\t_client.BaseAddress = new System.Uri(baseUri);\n\t\t\t_client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue(acceptHeader));\n\t\t}\n\n';
 
 	var functions = '';
 	if(typeof description.resources !== "undefined") { 
@@ -19,7 +38,23 @@ command.ProcessRequest = function (description) {
 		}
 	}
 
-	var closingStatements = '\t\tbool disposed = false;\n\n\t\tprotected virtual void Dispose(bool disposing)\n\t\t{\n\t\t\tif(disposed) return;\n\n\t\t\tif (disposing)\n\t\t\t{\n\t\t\t\t_client.Dispose();\n\t\t\t}\n\n\t\t\tdisposed = true;\n\t\t}\n\n\t\tpublic void Dispose()\n\t\t{\n\t\t\tDispose(true);\n\t\t\tGC.SuppressFinalize(this);\n\t\t}\n\t}\n}'
+	var closingStatements = '\t\tbool disposed = false;\n\n'
+						  + '\t\tprotected virtual void Dispose(bool disposing)\n'
+						  + '\t\t{\n'
+						  + '\t\t\tif(disposed) return;\n\n'
+						  + '\t\t\tif (disposing)\n'
+						  + '\t\t\t{\n'
+						  + '\t\t\t\t_client.Dispose();\n'
+						  + '\t\t\t}\n\n'
+						  + '\t\t\tdisposed = true;\n'
+						  + '\t\t}\n\n'
+						  + '\t\tpublic void Dispose()\n'
+						  + '\t\t{\n'
+						  + '\t\t\tDispose(true);\n'
+						  + '\t\t\tGC.SuppressFinalize(this);\n'
+						  + '\t\t}\n'
+						  + '\t}\n'
+						  + '}'
 
   	return namespaces + documentation + namespace + classcomments + classdeclaration + functions + closingStatements;
 };
@@ -50,7 +85,11 @@ function GenerateFunctionClient(resource, parentResource){
 }
 
 function GenerateFunction(method, resource){
-	var functionComment = '\t\t/// <summary>\n\t\t/// '+method.method+resource.uniqueId+'\n\t\t/// Documentation: '+method.description+'\n\t\t/// </summary>\n';
+	var functionComment = '\t\t/// <summary>\n'
+					    + '\t\t/// '+method.method+resource.uniqueId+'\n'
+					    + '\t\t/// Documentation: '+method.description+'\n'
+					    + '\t\t/// </summary>\n';
+    
     var uriParameters = "";
     if(typeof resource.uriParameters !== "undefined") { 
         for(var j in resource.uriParameters) { 
@@ -81,9 +120,9 @@ function GenerateFunction(method, resource){
 function GenerateFunctionBody(method, resource, uriParameters, queryParameters, putPostParam){
 	var parameters = uriParameters + queryParameters + putPostParam;
 	parameters = parameters[parameters.length-1] == ',' ? parameters.substring(0, parameters.length-1) : parameters;
-	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+method.method+resource.uniqueId+'('+ parameters +')\n';
-	functionName += '\t\t{\n';
-	functionName += '\t\t\tvar relativeUri = "' + (resource.parentUrl || '') + resource.relativeUri + '";\n';
+	var functionName = '\t\tpublic async Task<HttpResponseMessage> '+method.method+resource.uniqueId+'('+ parameters +')\n'
+					 + '\t\t{\n'
+					 + '\t\t\tvar relativeUri = "' + (resource.parentUrl || '') + resource.relativeUri + '";\n';
 	
 	if(resource.uriParameters){
 		for(var x in resource.uriParameters){
